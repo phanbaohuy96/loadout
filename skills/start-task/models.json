@@ -1,0 +1,43 @@
+{
+  "_about": "Model preferences for the start-task skill, by tier. resolve-model.py picks, at run time, the first candidate that is in the harness's live catalog and answers a one-word ping. Patterns are shell globs, tried in order; several matches of one glob are tried newest version first. A repository can replace this whole file with its own .agents/models.json. Claude Code is not listed: its subagents use the aliases `opus` and `sonnet` in agents/*.md, which always resolve to the latest models. If nothing matches, the subagent inherits the main session's model.",
+  "tiers": {
+    "strong": {
+      "effort": "high",
+      "used_by": "the reviewer subagent; also what to start the main session on (planning)"
+    },
+    "fast": {
+      "effort": "medium",
+      "used_by": "the implementer subagent"
+    }
+  },
+  "codex": {
+    "_note": "OpenAI first (gpt-6-sol costs what Sonnet 5 costs, so it is the strong tier and fast drops one size to Luna; gpt-6-astra is left out on cost). Then the models a Codex pointed at a proxy offered on 2026-09-27: grok, deepseek, qwen, kimi, glm. Catalogs rarely overlap, so order between families matters little.",
+    "strong": [
+      "gpt-6-sol",
+      "gpt-5.6-sol",
+      "gpt-5.5",
+      "grok-4.7",
+      "grok-4.[0-9]",
+      "deepseek-v4-pro",
+      "qwen3.8-max"
+    ],
+    "fast": [
+      "gpt-6-luna",
+      "gpt-5.6-luna",
+      "gpt-5.6-terra",
+      "grok-*-build-fast",
+      "kimi-*-code",
+      "deepseek-v4-flash",
+      "glm-*-flash"
+    ]
+  },
+  "grok": {
+    "strong": [
+      "grok-4.7",
+      "grok-4.[0-9]"
+    ],
+    "fast": [
+      "grok-*-build-fast"
+    ]
+  }
+}
