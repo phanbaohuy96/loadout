@@ -5,8 +5,8 @@
 Measured on real sessions: about 99% of tokens are **cache reads** — the whole context re-read on
 every turn. So a task costs context length × turns, far more than which model writes the code. The
 implementer saves mainly because it starts clean, carrying the plan and not the grilling transcript;
-the cheaper model saves again on top. But a spawn is not free (50–90k tokens on Claude, ~66k on
-Codex), so a `small` task is done in the main session, and every run ends with `measure.py`.
+the cheaper model saves again on top. But a spawn is not free (about 50–60k tokens on Claude, ~66k
+on Codex), so a `small` task is done in the main session, and every run ends with `measure.py`.
 
 ## Models
 
@@ -14,12 +14,13 @@ Codex), so a `small` task is done in the main session, and every run ends with `
 |---|---|---|---|
 | Claude Code | `sonnet`, effort medium | `opus`, effort high | `agents/start-task-*.md` frontmatter; aliases are always the newest model |
 | Codex | resolved | resolved | `resolve-model.py codex <tier>` → `<model> <effort>` |
-| Grok | resolved | resolved | `resolve-model.py grok <tier>` → `<model>`; effort is inherited |
+| Grok | resolved | resolved | `resolve-model.py grok <tier>` → `<model> <effort>`; pass only the model, effort is inherited |
 
 `resolve-model.py` reads the preference list — the repository's `.agents/models.json` if it exists,
 else `models.json` beside the script — takes the harness's live catalog (`~/.codex/models_cache.json`
 or `codex debug models`; `grok models`), and returns the first candidate that answers a one-word
-ping, cached for the day in `~/.cache/start-task/models/`. `--no-ping` skips the ping. Exit 3:
+ping, cached for the day in `~/.cache/start-task/models/` (a failed ping too; `--refresh` pings
+again). `--no-ping` skips the ping. A harness that is missing or does not answer offers nothing. Exit 3:
 nothing answered — spawn without a model and it inherits the main session's.
 
 The main session's model is fixed when it starts. Start it on the strong tier:
@@ -27,8 +28,9 @@ The main session's model is fixed when it starts. Start it on the strong tier:
 ```bash
 claude --model opus
 read model effort < <(~/.codex/skills/start-task/resolve-model.py codex strong)
-codex -m "$model" -c model_reasoning_effort="$effort"
-grok -m "$(~/.claude/skills/start-task/resolve-model.py grok strong | cut -d' ' -f1)"
+if [ -n "$model" ]; then codex -m "$model" -c model_reasoning_effort="$effort"; else codex; fi
+model=$(~/.claude/skills/start-task/resolve-model.py grok strong | cut -d' ' -f1)
+if [ -n "$model" ]; then grok -m "$model"; else grok; fi
 ```
 
 If the Claude agents are not installed (`~/.claude/agents/start-task-*.md`), spawn

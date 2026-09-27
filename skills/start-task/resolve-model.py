@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Pick a model for a start-task tier from what a harness offers right now.
 
-Usage: resolve-model.py <codex|grok> <strong|fast> [--no-ping]
+Usage: resolve-model.py <codex|grok> <strong|fast> [--no-ping] [--refresh]
 
 Prints `<model> <effort>` and exits 0, or prints nothing and exits 3 when no candidate is available
 (the caller then spawns without a model, which inherits the main session's). Candidates come from
 the repository's .agents/models.json when it has one, else the models.json beside this script; the
 catalog from the harness itself; availability from a one-word ping, cached for the day in
-~/.cache/start-task/models/ so a task pays for it at most once.
+~/.cache/start-task/models/ so a task pays for it at most once. A failed ping is cached too;
+--refresh pings again, for a model that has since recovered or been given credit.
 """
 import datetime, fnmatch, json, os, re, subprocess, sys, tempfile
 
@@ -18,6 +19,13 @@ PING = "Reply with the single word OK."
 
 
 def catalog(harness):
+    try:
+        return listed(harness)
+    except (OSError, ValueError, subprocess.SubprocessError):
+        return []  # the harness is not installed, or did not answer: nothing is offered
+
+
+def listed(harness):
     if harness == "codex":
         # The provider's own list, refreshed each time Codex starts; the bundled list is the fallback.
         path = os.path.expanduser("~/.codex/models_cache.json")
@@ -40,7 +48,7 @@ def answers(harness, model):
     mark = os.path.join(CACHE, harness, model)
     try:
         day, verdict = open(mark).read().split()
-        if day == today:
+        if day == today and "--refresh" not in sys.argv:
             return verdict == "ok"
     except (OSError, ValueError):
         pass
@@ -54,7 +62,7 @@ def answers(harness, model):
         try:
             out = subprocess.run(cmd, capture_output=True, text=True, timeout=120, cwd=empty,
                                  stdin=subprocess.DEVNULL).stdout
-        except subprocess.TimeoutExpired:
+        except (OSError, subprocess.SubprocessError):
             out = ""
     ok = any(line.strip().strip("*.") == "OK" for line in out.splitlines())
     os.makedirs(os.path.dirname(mark), exist_ok=True)

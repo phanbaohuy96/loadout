@@ -31,7 +31,7 @@ If the main session is not on the strong tier, say so once and suggest restartin
 4. Show the plan with its Size; wait for the go-ahead.
 
 ## Phase 2 — Implement
-- **small:** do it yourself, following `<skill>/roles/implementer.md`. A spawn costs 50–90k tokens.
+- **small:** do it yourself, following `<skill>/roles/implementer.md`. A spawn costs ~50–66k tokens.
 - **normal:** spawn the implementer with only the plan path, branch and the line "Read
   `<skill>/roles/implementer.md`; it is your role." Claude: `subagent_type: start-task-implementer`.
   Codex: `spawn_agent` with `model` + `reasoning_effort` from the resolver (timeouts are integers).
