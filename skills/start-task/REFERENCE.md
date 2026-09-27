@@ -64,7 +64,8 @@ Keep the plan out of git: `grep -qx '.agents/plans/' .git/info/exclude || echo '
 
 ## Review skill names
 
-The user types a skill as they know it (`/review`, `code-review`, `security-review`…). The reviewer
+The default, `/review`, is gstack's pre-landing PR review (https://github.com/garrytan/gstack). The
+user can type any other skill as they know it (`code-review`, `security-review`…). The reviewer
 strips a leading `/` and looks for it in its harness; if absent it tries `gstack-<name>` (how gstack
 names skills in Codex). Not found → it says so and falls back to the `builtin` checklist. Claude
 Code's built-in `/code-review <PR>` can also be run by the user as a second opinion.
