@@ -19,20 +19,29 @@ Run it against this PR, with these constraints over anything the skill says:
 - Read-only: apply no fix, even if the skill offers auto-fixes. List them as findings instead.
 - You cannot ask the user. Where the skill would ask, pick the report-only option and note it.
 - Nothing is posted, committed or pushed.
+- Run the skill **in full**: every pass it has (specialists, adversarial, QA, test runs) that works
+  without a PR or network. Name each pass you skipped in `NOT CHECKED`, with the reason; a partial
+  run must not end in `approve` without saying so.
 
 Then also check **plan coverage** (below) yourself, and put everything in the report shape.
 If the skill cannot be found, say so in `NOT CHECKED` and use the builtin checklist.
 
 ## Builtin checklist (skill `builtin`, or fallback) — most important first
 
-1. **Correctness** — bugs, broken edge cases, races, error paths, security holes.
+1. **Correctness** — bugs, broken edge cases, races, error paths, security holes. For async code,
+   walk the orderings: events arriving late, early, twice, or interleaved with another
+   request/turn/session/tap, and which one each value is attributed to.
 2. **The plan** — does the diff do what the plan says, all of it, and nothing outside it?
 3. **The repository's rules** — whatever `AGENTS.md` / `CLAUDE.md` demand (tests, docs, i18n,
    requirement IDs…); every identifier or path the change cites exists.
 4. **Claims** — every claim in the PR body and changed documents is backed by output or code.
-5. **Tests** — the change is covered; a new assertion would actually fail if the code were wrong.
+5. **Tests** — the change is covered; a new assertion would actually fail if the code were wrong
+   (an instant fake makes `<=` / `isA<int>()` checks trivially true). Flag tests that depend on
+   wall-clock time with a tight margin: they flake on a loaded CI.
 
 Report only what you can point at. No style preferences the repository does not already enforce.
+If the prompt that spawned you lists focus areas or past fixes, review those, but do not limit
+yourself to them: the whole diff is in scope.
 
 ## Report — in this shape
 

@@ -39,8 +39,9 @@ If the main session is not on the strong tier, say so once and suggest restartin
 - Plan reported wrong or blocked → back to phase 1 with the user; never patch the design yourself.
 
 ## Phase 3 — Check
-Never trust the report: `git diff --stat` matches **Changes** and nothing else moved; re-run every
-**Verify** command yourself. Small fixes are fine; design changes go back to the user.
+Never trust the report: `git diff --stat` matches **Changes** and nothing else moved (watch for a
+formatter run over whole directories: revert every file, or hunk, that only changed formatting);
+re-run every **Verify** command yourself. Small fixes are fine; design changes go back to the user.
 
 ## Phase 4 — Commit and PR (ask first)
 Show the diff summary, verify output and a commit message in the repository's style. Ask:
@@ -56,6 +57,18 @@ Spawn the reviewer (strong tier) with the three paths, the chosen skill, and "Re
 `<skill>/roles/reviewer.md`; it is your role." Claude: `subagent_type: start-task-reviewer`.
 Relay findings most severe first; ask: fix (small yourself, larger via another implementer run),
 post as PR comments (outward-facing — only on a yes), or leave.
+
+The same applies when the user asks for a review before the PR exists: save `git diff <base>` as
+`<slug>.pr.diff` instead.
+
+**Review rounds** (after any fix, and always when the user says "until clean"):
+- Every round spawns a **new** reviewer. Never resume or message an earlier one: it checks its own
+  old findings and approves.
+- Give it only the paths, the base, the skill and the role line. Do not summarise what you fixed and
+  do not narrow its focus: that framing is exactly where the misses hide.
+- Review the whole change from the base each round, not only the latest fix.
+- "Clean" means a fresh reviewer reported **no findings at all**, lows included. Fixing the last
+  findings yourself without another round does not make it clean; say "fixed, not re-reviewed".
 
 ## Phase 6 — Report cost
 `<skill>/measure.py claude` (or `codex`) — show the table; if the implementer's cache reads were not

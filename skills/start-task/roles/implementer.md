@@ -17,6 +17,9 @@ it out exactly, prove it, and report honestly. You do not make design decisions.
 - If the plan is wrong, contradicts the code, or leaves a decision open: **stop and report**. Do not
   choose for the user.
 - Match the surrounding code: naming, idiom, comment density.
+- Format only the files you changed, with the repository's own command. Never run a formatter or
+  auto-fixer over a whole directory: a different formatter version rewrites files you never touched
+  (generated files included).
 - Never commit, push, switch branches, open pull requests or post anything anywhere.
 
 ## Before reporting
